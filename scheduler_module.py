@@ -65,6 +65,19 @@ async def send_subscription_alert(bot):
             await channel.send(embed=embed)
 
 
+def ensure_guild_config(guild_id: str, channel_id: int):
+    config = get_guild_configs()
+    if guild_id not in config:
+        config[guild_id] = {
+            "channel_id": channel_id,
+            "alerts": {
+                "battleground": True,
+                "subscription": True
+            }
+        }
+        with open(CONFIG_PATH, "w", encoding="utf-8") as f:
+            json.dump(config, f, indent=2, ensure_ascii=False)
+
 def start_schedulers(bot):
         # ✅ 실제 배포 시 사용
     # scheduler.add_job(send_battleground_alert, "cron", hour=0, minute=0, args=[bot])
