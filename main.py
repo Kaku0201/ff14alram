@@ -11,7 +11,8 @@ import asyncio
 # ✅ Flask 웹서버 (UptimeRobot용)
 # --------------------------------------
 app = Flask('')
-
+keep_alive()
+bot.run(TOKEN)
 
 @app.route('/')
 def home():
