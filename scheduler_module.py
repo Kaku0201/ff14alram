@@ -5,7 +5,9 @@ import discord
 import json
 import os
 from datetime import datetime
+import pytz
 
+KST = pytz.timezone('Asia/Seoul')
 CONFIG_PATH = "data/config.json"
 scheduler = AsyncIOScheduler()
 
@@ -16,7 +18,8 @@ def get_guild_configs():
     with open(CONFIG_PATH, "r", encoding="utf-8") as f:
         return json.load(f)
 
-def save_config(config):  # ← 이 부분 추가
+def save_config(config):
+    os.makedirs(os.path.dirname(CONFIG_PATH), exist_ok=True)
     with open(CONFIG_PATH, "w", encoding="utf-8") as f:
         json.dump(config, f, indent=2, ensure_ascii=False)
 
@@ -52,7 +55,7 @@ async def send_battleground_alert(bot):
 async def send_subscription_alert(bot):
     config = get_guild_configs()
     state, start, end = get_subscription_state()
-    now = datetime.now()
+    now = datetime.now(KST)  # ✅ 한국 시간 기준
     기간_str = f"{start.strftime('%m월 %d일')} ~ {end.strftime('%m월 %d일')}"
     마감시간 = end.strftime('%m월 %d일 %H:%M')
 
@@ -81,7 +84,8 @@ async def send_subscription_alert(bot):
         if not channel:
             continue
 
-        if state == "청약 신청 기간" and now.hour == 0 and now.minute == 0:
+        # ✅ 알림 시각 조건 수정 (00:00 → 00:01)
+        if state == "청약 신청 기간" and now.hour == 0 and now.minute == 1:
             embed = generate_subscription_embed("신청 시작", 기간_str)
             await channel.send(embed=embed)
 
@@ -89,14 +93,13 @@ async def send_subscription_alert(bot):
             embed = generate_subscription_embed("신청 마감", 기간_str, 마감시간)
             await channel.send(embed=embed)
 
-        elif state == "당첨 확인 기간" and now.hour == 0 and now.minute == 0:
+        elif state == "당첨 확인 기간" and now.hour == 0 and now.minute == 1:
             embed = generate_subscription_embed("당첨 확인 시작", 기간_str)
             await channel.send(embed=embed)
 
         elif state == "당첨 확인 기간" and now.hour == 23 and now.minute == 50:
             embed = generate_subscription_embed("당첨 마감", 기간_str, 마감시간)
             await channel.send(embed=embed)
-
 
 
 def ensure_guild_config(guild_id: str, channel_id: int):
@@ -109,16 +112,9 @@ def ensure_guild_config(guild_id: str, channel_id: int):
                 "subscription": True
             }
         }
-        with open(CONFIG_PATH, "w", encoding="utf-8") as f:
-            json.dump(config, f, indent=2, ensure_ascii=False)
+        save_config(config)
 
 def start_schedulers(bot):
-        # ✅ 실제 배포 시 사용
     scheduler.add_job(send_battleground_alert, "cron", hour=0, minute=0, args=[bot])
-    scheduler.add_job(send_subscription_alert, "cron", hour="0,23", minute="0,50", args=[bot])
-
-        # ✅ 테스트용 (1분마다 알림 테스트)
-    # scheduler.add_job(send_battleground_alert, "interval", minutes=1, args=[bot])
-    # scheduler.add_job(send_subscription_alert, "interval", minutes=1, args=[bot])
-    
+    scheduler.add_job(send_subscription_alert, "cron", hour="0,23", minute="1,50", args=[bot])
     scheduler.start()
