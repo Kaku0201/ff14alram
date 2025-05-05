@@ -7,12 +7,16 @@ import os
 CONFIG_PATH = "data/config.json"
 
 
-def load_config():
+def ensure_config_file():
     if not os.path.exists(CONFIG_PATH):
-        return {}
+        os.makedirs(os.path.dirname(CONFIG_PATH), exist_ok=True)
+        with open(CONFIG_PATH, "w", encoding="utf-8") as f:
+            json.dump({}, f)
+
+def load_config():
+    ensure_config_file()  # ✅ 없으면 자동 생성
     with open(CONFIG_PATH, "r", encoding="utf-8") as f:
         return json.load(f)
-
 
 def save_config(config):
     with open(CONFIG_PATH, "w", encoding="utf-8") as f:
