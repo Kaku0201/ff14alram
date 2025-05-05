@@ -19,9 +19,24 @@ def get_guild_configs():
 
 async def send_battleground_alert(bot):
     config = get_guild_configs()
-    for guild_id, setting in config.items():
-        if not setting.get("alerts", {}).get("battleground", True):
+    for guild in bot.guilds:
+        guild_id = str(guild.id)
+        if guild_id not in config:
+            default_channel = guild.system_channel or next((c for c in guild.text_channels if c.permissions_for(guild.me).send_messages), None)
+            if default_channel:
+                config[guild_id] = {
+                    "channel_id": default_channel.id,
+                    "alerts": {
+                        "battleground": True,
+                        "subscription": True
+                    }
+                }
+                save_config(config)
+
+        setting = config.get(guild_id)
+        if not setting or not setting.get("alerts", {}).get("battleground", True):
             continue
+
         channel_id = setting.get("channel_id")
         if not channel_id:
             continue
@@ -38,9 +53,24 @@ async def send_subscription_alert(bot):
     기간_str = f"{start.strftime('%m월 %d일')} ~ {end.strftime('%m월 %d일')}"
     마감시간 = end.strftime('%m월 %d일 %H:%M')
 
-    for guild_id, setting in config.items():
-        if not setting.get("alerts", {}).get("subscription", True):
+    for guild in bot.guilds:
+        guild_id = str(guild.id)
+        if guild_id not in config:
+            default_channel = guild.system_channel or next((c for c in guild.text_channels if c.permissions_for(guild.me).send_messages), None)
+            if default_channel:
+                config[guild_id] = {
+                    "channel_id": default_channel.id,
+                    "alerts": {
+                        "battleground": True,
+                        "subscription": True
+                    }
+                }
+                save_config(config)
+
+        setting = config.get(guild_id)
+        if not setting or not setting.get("alerts", {}).get("subscription", True):
             continue
+
         channel_id = setting.get("channel_id")
         if not channel_id:
             continue
@@ -63,6 +93,7 @@ async def send_subscription_alert(bot):
         elif state == "당첨 확인 기간" and now.hour == 23 and now.minute == 50:
             embed = generate_subscription_embed("당첨 마감", 기간_str, 마감시간)
             await channel.send(embed=embed)
+
 
 
 def ensure_guild_config(guild_id: str, channel_id: int):
