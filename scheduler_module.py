@@ -66,16 +66,9 @@ async def send_subscription_alert(bot):
 
 
 def start_schedulers(bot):
-    # scheduler.add_job(send_battleground_alert,
-                      "cron",
-                      hour=0,
-                      minute=0,
-                      args=[bot])
-    # scheduler.add_job(send_subscription_alert,
-                      "cron",
-                      hour="0,23",
-                      minute="0,50",
-                      args=[bot])
+        # ✅ 실제 배포 시 사용
+    # scheduler.add_job(send_battleground_alert, "cron", hour=0, minute=0, args=[bot])
+    # scheduler.add_job(send_subscription_alert, "cron", hour="0,23", minute="0,50", args=[bot])
 
         # ✅ 테스트용 (1분마다 알림 테스트)
     scheduler.add_job(send_battleground_alert, "interval", minutes=1, args=[bot])
