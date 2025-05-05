@@ -5,10 +5,16 @@ from discord.ext import commands
 from discord import app_commands
 import asyncio
 from keep_alive import keep_alive
+from config_manager import get_config, save_config  # ✅ 추가
 
 # ✅ 디스코드 봇 설정
 intents = discord.Intents.default()
 bot = commands.Bot(command_prefix="!", intents=intents)
+
+# ✅ config 객체를 bot에 저장
+config = get_config()
+bot.config = config
+bot.save_config = save_config
 
 # ✅ 봇 준비 완료 시
 @bot.event
