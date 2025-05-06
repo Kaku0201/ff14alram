@@ -55,7 +55,7 @@ async def send_battleground_alert(bot):
 async def send_subscription_alert(bot):
     config = get_guild_configs()
     state, start, end = get_subscription_state()
-    now = datetime.now(KST)  # ✅ 한국 시간 기준
+    now = datetime.now(KST).replace(second=0, microsecond=0)
     기간_str = f"{start.strftime('%m월 %d일')} ~ {end.strftime('%m월 %d일')}"
     마감시간 = end.strftime('%m월 %d일 %H:%M')
 
@@ -84,22 +84,24 @@ async def send_subscription_alert(bot):
         if not channel:
             continue
 
-        # ✅ 알림 시각 조건 수정 (00:00 → 00:01)
-        if state == "청약 신청 기간" and now.hour == 0 and now.minute == 1:
-            embed = generate_subscription_embed("신청 시작", 기간_str)
-            await channel.send(embed=embed)
+         # 🔔 정확한 시작일 / 마감일 조건 추가
+        if state == "청약 신청 기간":
+            if now.date() == start.date() and now.hour == 0 and now.minute == 1:
+                embed = generate_subscription_embed("신청 시작", 기간_str)
+                await channel.send(embed=embed)
 
-        elif state == "청약 신청 기간" and now.hour == 23 and now.minute == 50:
-            embed = generate_subscription_embed("신청 마감", 기간_str, 마감시간)
-            await channel.send(embed=embed)
+            elif now.date() == end.date() and now.hour == 23 and now.minute == 50:
+                embed = generate_subscription_embed("신청 마감", 기간_str, 마감시간)
+                await channel.send(embed=embed)
 
-        elif state == "당첨 확인 기간" and now.hour == 0 and now.minute == 1:
-            embed = generate_subscription_embed("당첨 확인 시작", 기간_str)
-            await channel.send(embed=embed)
+        elif state == "당첨 확인 기간":
+            if now.date() == start.date() and now.hour == 0 and now.minute == 1:
+                embed = generate_subscription_embed("당첨 확인 시작", 기간_str)
+                await channel.send(embed=embed)
 
-        elif state == "당첨 확인 기간" and now.hour == 23 and now.minute == 50:
-            embed = generate_subscription_embed("당첨 마감", 기간_str, 마감시간)
-            await channel.send(embed=embed)
+            elif now.date() == end.date() and now.hour == 23 and now.minute == 50:
+                embed = generate_subscription_embed("당첨 마감", 기간_str, 마감시간)
+                await channel.send(embed=embed)
 
 
 def ensure_guild_config(guild_id: str, channel_id: int):
