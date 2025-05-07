@@ -14,12 +14,13 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 @bot.event
 async def on_ready():
     print(f"✅ Logged in as {bot.user}")
+
     try:
-        synced = await bot.tree.sync()
-        print(f"✅ Synced {len(synced)} slash commands.")
+        # 전 서버에 명령어 동기화
+        await bot.tree.sync()  # 전역 등록 (모든 서버 대상)
+        print(f"✅ Synced slash commands globally.")
     except Exception as e:
         print(f"❌ Slash command sync failed: {e}")
-    start_schedulers(bot)
 
 # ✅ 확장(cogs) 로딩
 async def load_extensions():
