@@ -10,6 +10,13 @@ from keep_alive import keep_alive
 intents = discord.Intents.default()
 bot = commands.Bot(command_prefix="!", intents=intents)
 
+# ✅ 슬래시 명령어 에러 처리 핸들러
+@bot.tree.error
+async def on_app_command_error(interaction: discord.Interaction, error):
+    if isinstance(error, app_commands.errors.MissingPermissions):
+        await interaction.response.send_message(
+            "❗이 명령어는 **관리자만 사용할 수 있어요!**", ephemeral=True)
+
 # ✅ 봇 준비 완료 시
 @bot.event
 async def on_ready():
