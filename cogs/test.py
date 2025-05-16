@@ -1,3 +1,5 @@
+print(f"[LOAD] test.py ({__file__})")
+
 from discord.ext import commands
 from discord import app_commands, Interaction
 from scheduler_module import send_battleground_alert, send_subscription_alert
