@@ -1,3 +1,5 @@
+print(f"[LOAD] scheduler_module.py ({__file__})")
+
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from utils.subscription_utils import get_subscription_state, generate_subscription_embed
 from utils.battleground_utils import format_battleground_embed
