@@ -24,6 +24,7 @@ def save_config(config):
         json.dump(config, f, indent=2, ensure_ascii=False)
 
 async def send_battleground_alert(bot):
+    print(f"[{datetime.now()}] send_battleground_alert 실행됨")
     config = get_guild_configs()
     for guild in bot.guilds:
         guild_id = str(guild.id)
@@ -53,6 +54,7 @@ async def send_battleground_alert(bot):
 
 
 async def send_subscription_alert(bot):
+    print(f"[{datetime.now()}] send_subscription_alert 실행됨")
     config = get_guild_configs()
     state, start, end = get_subscription_state()
     now = datetime.now(KST).replace(second=0, microsecond=0)
