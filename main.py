@@ -24,22 +24,24 @@ async def on_ready():
 
     try:
         # 전 서버에 명령어 동기화
-        await bot.tree.sync()  # 전역 등록 (모든 서버 대상)
+        await bot.tree.sync()
         print(f"✅ Synced slash commands globally.")
     except Exception as e:
         print(f"❌ Slash command sync failed: {e}")
 
 # ✅ 확장(cogs) 로딩
 async def load_extensions():
-    await bot.load_extension("cogs.battleground")
-    await bot.load_extension("cogs.subscription")
-    await bot.load_extension("cogs.settings")
-    await bot.load_extension("cogs.test")
+    await bot.load_extension("battleground")
+    await bot.load_extension("subscription")
+    await bot.load_extension("settings")
+    await bot.load_extension("alert_settings")
+    await bot.load_extension("test")
 
 # ✅ 메인 실행 함수
 async def main():
-    keep_alive()  # Flask 서버 실행 (UptimeRobot용)
-    await load_extensions()
+    keep_alive()             # UptimeRobot 대응 Flask 서버
+    await load_extensions()  # Cog(확장) 모듈 로딩
+    start_schedulers(bot)    # ✅ 스케줄러 등록 (이 줄이 가장 중요!)
     await bot.start(os.environ['TOKEN'])
 
 # ✅ 시작
