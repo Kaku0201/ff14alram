@@ -21,11 +21,12 @@ class Test(commands.Cog):
     )
     @app_commands.checks.has_permissions(administrator=True)
     async def 알림테스트(self, interaction: Interaction, 종류: app_commands.Choice[str]):
+        guild_id = interaction.guild.id  # 명령어 사용한 서버만
         if 종류.value == "전장":
-            await send_battleground_alert(self.bot)
+            await send_battleground_alert(self.bot, target_guild_id=guild_id)
             await interaction.response.send_message("⚔️ 전장 알림 테스트 완료!", ephemeral=True)
         else:
-            await send_subscription_alert(self.bot, force=True)
+            await send_subscription_alert(self.bot, force=True, target_guild_id=guild_id)
             await interaction.response.send_message("📅 청약 알림 테스트 완료!", ephemeral=True)
 
 async def setup(bot):
