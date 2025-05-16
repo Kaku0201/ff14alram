@@ -2,7 +2,7 @@
 name = "ff14alram"
 version = "0.2.0"
 description = ""
-authors = [Kaku"]
+authors = ["Kaku"]
 requires-python = ">=3.11"
 dependencies = [
     "discord.py>=2.5.2",
