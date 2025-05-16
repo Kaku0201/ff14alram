@@ -24,10 +24,12 @@ def save_config(config):
     with open(CONFIG_PATH, "w", encoding="utf-8") as f:
         json.dump(config, f, indent=2, ensure_ascii=False)
 
-async def send_battleground_alert(bot, force=False):   # ← force는 확장성 예시
-    print(f"[{datetime.now()}] send_battleground_alert 호출됨 (force={force})")
+async def send_battleground_alert(bot, target_guild_id=None):
+    print(f"[{datetime.now()}] send_battleground_alert 호출됨 target_guild_id={target_guild_id}")
     config = get_guild_configs()
     for guild in bot.guilds:
+        if target_guild_id and str(guild.id) != str(target_guild_id):
+            continue
         guild_id = str(guild.id)
         if guild_id not in config:
             default_channel = guild.system_channel or next(
@@ -54,8 +56,8 @@ async def send_battleground_alert(bot, force=False):   # ← force는 확장성 
             embed = format_battleground_embed()
             await channel.send(embed=embed)
 
-async def send_subscription_alert(bot, force=False):   # ← force 파라미터 추가
-    print(f"[{datetime.now()}] send_subscription_alert 호출됨 (force={force})")
+async def send_subscription_alert(bot, force=False, target_guild_id=None):
+    print(f"[{datetime.now()}] send_subscription_alert 호출됨 force={force} target_guild_id={target_guild_id}")
     config = get_guild_configs()
     state, start, end = get_subscription_state()
     now = datetime.now(KST).replace(second=0, microsecond=0)
@@ -63,6 +65,8 @@ async def send_subscription_alert(bot, force=False):   # ← force 파라미터 
     마감시간 = end.strftime('%m월 %d일 %H:%M')
 
     for guild in bot.guilds:
+        if target_guild_id and str(guild.id) != str(target_guild_id):
+            continue
         guild_id = str(guild.id)
         if guild_id not in config:
             default_channel = guild.system_channel or next(
@@ -88,13 +92,19 @@ async def send_subscription_alert(bot, force=False):   # ← force 파라미터 
         if not channel:
             continue
 
-        # ✅ force가 True면 무조건 테스트 알림 전송!
         if force:
-            embed = generate_subscription_embed("테스트 청약", 기간_str)
+            # 테스트 전용 청약 알림 Embed
+            embed = discord.Embed(
+                title="(테스트) 청약 알림",
+                description="이 메시지는 테스트 명령어로 발송된 예시 알림입니다.",
+                color=0x3498db
+            )
+            embed.add_field(name="기간", value=기간_str, inline=False)
+            embed.set_footer(text="실제 알림은 일정에 맞춰 발송됩니다.")
             await channel.send(embed=embed)
             continue
 
-        # 🔔 실제 스케줄러 알림 분기
+        # 🔔 실제 일정에 따라 분기
         if state == "청약 신청 기간":
             if now.date() == start.date() and now.hour == 0 and now.minute == 1:
                 embed = generate_subscription_embed("신청 시작", 기간_str)
