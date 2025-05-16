@@ -34,7 +34,7 @@ async def load_extensions():
     await bot.load_extension("cogs.battleground")
     await bot.load_extension("cogs.subscription")
     await bot.load_extension("cogs.settings")
-    await bot.load_extension("cogs.alert_settings")
+    # await bot.load_extension("cogs.alert_settings")
     await bot.load_extension("cogs.test")
 
 # ✅ 메인 실행 함수
