@@ -25,7 +25,7 @@ class Test(commands.Cog):
             await send_battleground_alert(self.bot)
             await interaction.response.send_message("⚔️ 전장 알림 테스트 완료!", ephemeral=True)
         else:
-            await send_subscription_alert(self.bot)
+            await send_subscription_alert(self.bot, force=True)
             await interaction.response.send_message("📅 청약 알림 테스트 완료!", ephemeral=True)
 
 async def setup(bot):
