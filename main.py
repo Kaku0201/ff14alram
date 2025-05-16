@@ -1,3 +1,5 @@
+print(f"[LOAD] main.py ({__file__})")
+
 from scheduler_module import start_schedulers
 import os
 import discord
