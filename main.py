@@ -31,11 +31,11 @@ async def on_ready():
 
 # ✅ 확장(cogs) 로딩
 async def load_extensions():
-    await bot.load_extension("battleground")
-    await bot.load_extension("subscription")
-    await bot.load_extension("settings")
-    await bot.load_extension("alert_settings")
-    await bot.load_extension("test")
+    await bot.load_extension("cogs.battleground")
+    await bot.load_extension("cogs.subscription")
+    await bot.load_extension("cogs.settings")
+    await bot.load_extension("cogs.alert_settings")
+    await bot.load_extension("cogs.test")
 
 # ✅ 메인 실행 함수
 async def main():
