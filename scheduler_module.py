@@ -11,7 +11,6 @@ KST = pytz.timezone('Asia/Seoul')
 CONFIG_PATH = "data/config.json"
 scheduler = AsyncIOScheduler()
 
-
 def get_guild_configs():
     if not os.path.exists(CONFIG_PATH):
         return {}
@@ -24,12 +23,13 @@ def save_config(config):
         json.dump(config, f, indent=2, ensure_ascii=False)
 
 async def send_battleground_alert(bot):
-    print(f"[{datetime.now()}] send_battleground_alert 실행됨")
+    print(f"[{datetime.now()}] send_battleground_alert 호출됨")
     config = get_guild_configs()
     for guild in bot.guilds:
         guild_id = str(guild.id)
         if guild_id not in config:
-            default_channel = guild.system_channel or next((c for c in guild.text_channels if c.permissions_for(guild.me).send_messages), None)
+            default_channel = guild.system_channel or next(
+                (c for c in guild.text_channels if c.permissions_for(guild.me).send_messages), None)
             if default_channel:
                 config[guild_id] = {
                     "channel_id": default_channel.id,
@@ -52,9 +52,8 @@ async def send_battleground_alert(bot):
             embed = format_battleground_embed()
             await channel.send(embed=embed)
 
-
 async def send_subscription_alert(bot):
-    print(f"[{datetime.now()}] send_subscription_alert 실행됨")
+    print(f"[{datetime.now()}] send_subscription_alert 호출됨")
     config = get_guild_configs()
     state, start, end = get_subscription_state()
     now = datetime.now(KST).replace(second=0, microsecond=0)
@@ -64,7 +63,8 @@ async def send_subscription_alert(bot):
     for guild in bot.guilds:
         guild_id = str(guild.id)
         if guild_id not in config:
-            default_channel = guild.system_channel or next((c for c in guild.text_channels if c.permissions_for(guild.me).send_messages), None)
+            default_channel = guild.system_channel or next(
+                (c for c in guild.text_channels if c.permissions_for(guild.me).send_messages), None)
             if default_channel:
                 config[guild_id] = {
                     "channel_id": default_channel.id,
@@ -86,7 +86,7 @@ async def send_subscription_alert(bot):
         if not channel:
             continue
 
-         # 🔔 정확한 시작일 / 마감일 조건 추가
+        # 🔔 정확한 시작일 / 마감일 조건 추가
         if state == "청약 신청 기간":
             if now.date() == start.date() and now.hour == 0 and now.minute == 1:
                 embed = generate_subscription_embed("신청 시작", 기간_str)
@@ -104,7 +104,6 @@ async def send_subscription_alert(bot):
             elif now.date() == end.date() and now.hour == 23 and now.minute == 50:
                 embed = generate_subscription_embed("당첨 마감", 기간_str, 마감시간)
                 await channel.send(embed=embed)
-
 
 def ensure_guild_config(guild_id: str, channel_id: int):
     config = get_guild_configs()
